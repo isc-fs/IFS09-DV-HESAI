@@ -30,6 +30,7 @@ A backlog item is done when:
 | Expose the remake (organized grid) in the YAML | PR #1 |
 | Unit tests and lidar-free end-to-end harness | PR #1 |
 | Driver internals reference | [DRIVER_INTERNALS.md](DRIVER_INTERNALS.md) |
+| Check whether the audit's noise comes from the driver | [NOISE_CHECK.md](NOISE_CHECK.md) |
 
 ## Next: needs the DVPC (car computer) reachable
 
@@ -40,7 +41,7 @@ umbilical).
 |---|---|---|---|
 | 1 | **Compare the car's driver copy with this fork** | S | The car runs an unversioned copy in `~/ros2_ws/src/HesaiLidar_ROS_2.0`. It publishes best effort, which upstream never did, so it has local changes. Record its upstream version (`git -C ... log -1`, `git status`, `git diff`), port every local change into this fork, and note them here. |
 | 2 | **Bring the car's `config.yaml` into the repo** | S | Save it as `config/ifs09_atx.yaml` (IPs, `use_timestamp_type: 0`, FOV values from the `fov` tool). From then on the config is versioned here. |
-| 3 | **Check what the lidar actually sends** | S | From the driver log at start-up: were the angle and firetime corrections loaded from the lidar? Is the confidence status bit set in the packet header? Which return mode (strongest / last / dual)? These also matter for the noise investigation. |
+| 3 | **Check what the lidar actually sends** | S | From the driver log at start-up: were the angle and firetime corrections loaded from the lidar? Is the confidence status bit set in the packet header? Which return mode (strongest / last / dual)? Also: `sysctl net.core.rmem_max` and whether `CYCLONEDDS_URI` is set (see #15). See [NOISE_CHECK.md](NOISE_CHECK.md). |
 | 4 | **Swap the car over to the fork, defaults only** | M | Build in `~/ros2_ws`, keep the old copy as a rollback. Record a short bag and check that `/lidar_points` is identical in layout, rate and stamps to before. |
 
 ## Then
@@ -61,7 +62,10 @@ umbilical).
 | 11 | **Ring grid + range-image cone detection** | L | Enable `remake` with `use_ring: true`. Ground removal and clustering on a fixed image are O(n) and avoid RANSAC + DBSCAN, which is what limits `cone_detection` throughput. Needs pipeline work. |
 | 12 | **Crop in the driver** | M | Range / height / azimuth limits applied in the parse threads, so the pipeline gets fewer points. Needs the real extrinsic (the lidar is pitched ~8.7° down, the TF says 0). Keep one source of truth: either the driver applies the extrinsic and the TF is identity, or neither. |
 | 13 | **Use confidence for filtering** | M | Once #3 confirms the byte is filled: study it against the noise audit (far-range flicker) and add a threshold option. |
-| 14 | **Faster conversion / publish off the parse thread** | M | Only if #4 shows the ~20 ms conversion + delivery matters. |
+| 14 | **Faster conversion / publish off the parse thread** | M | Hesai confirms publishing in the decode thread causes loss with several subscribers ([ROS_2.0#91](https://github.com/HesaiTechnology/HesaiLidar_ROS_2.0/issues/91)) and promises a fix upstream; take theirs if it lands first. |
+| 15 | **Tune Cyclone DDS for large messages on the DVPC** | S | Documented ROS 2 fix for large-message loss (*DDS tuning* guide): `net.core.rmem_max=2147483647` in `/etc/sysctl.d/`, a Cyclone XML with `<SocketReceiveBufferSize min="10MB"/>` passed via `CYCLONEDDS_URI` in every service; optionally `net.ipv4.ipfrag_time=3`, `net.ipv4.ipfrag_high_thresh=134217728`. Lives in the pipeline repo's `deploy/`. Measure the bag's missing-cloud rate before and after (11.9 % today). |
+| 16 | **Mask the 8 lowest channels** | S | Rings 60–63 and 112–115 return only beyond ~4 m and are the only source of below-ground strays ([NOISE_CHECK.md](NOISE_CHECK.md)). Drop them with `channel_fov_filter_path` (whole azimuth range per channel) or a ring list option. Confirm on a new bag first. |
+| 17 | **Ask Hesai about the ~4 m floor on the lowest channels** | S | Is it fixed by design or a setting? Include the table from NOISE_CHECK.md. |
 
 ## Decision log
 

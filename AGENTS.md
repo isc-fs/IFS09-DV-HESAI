@@ -7,6 +7,7 @@ ISC Formula Student fork of Hesai's ROS 2 driver, used for the IFS09 Hesai ATX l
 - `docs/ISC.md`: what this fork adds and how to configure it.
 - `docs/DRIVER_INTERNALS.md`: how the ATX is decoded; read before touching the decoder.
 - `docs/ROADMAP.md`: backlog, decisions, what is blocked on the car.
+- `docs/NOISE_CHECK.md`: which ATX noise is sensor, delivery, driver or pipeline.
 
 ## Rules
 

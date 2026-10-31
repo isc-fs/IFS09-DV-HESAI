@@ -1,7 +1,7 @@
 # ISC fork of the Hesai ROS 2 driver
 
 See also: [DRIVER_INTERNALS.md](DRIVER_INTERNALS.md) (how the ATX is decoded),
-[ROADMAP.md](ROADMAP.md) (backlog and next steps), [GLOSSARY.md](GLOSSARY.md).
+[ROADMAP.md](ROADMAP.md) (backlog and next steps), [NOISE_CHECK.md](NOISE_CHECK.md) (is the noise from the driver?), [GLOSSARY.md](GLOSSARY.md).
 
 Fork of [HesaiLidar_ROS_2.0](https://github.com/HesaiTechnology/HesaiLidar_ROS_2.0) for the
 IFS09 Hesai ATX. Upstream behaviour is kept unless you set one of the options below; the only

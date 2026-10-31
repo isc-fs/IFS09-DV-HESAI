@@ -1,5 +1,8 @@
 # ISC fork of the Hesai ROS 2 driver
 
+See also: [DRIVER_INTERNALS.md](DRIVER_INTERNALS.md) (how the ATX is decoded),
+[ROADMAP.md](ROADMAP.md) (backlog and next steps), [GLOSSARY.md](GLOSSARY.md).
+
 Fork of [HesaiLidar_ROS_2.0](https://github.com/HesaiTechnology/HesaiLidar_ROS_2.0) for the
 IFS09 Hesai ATX. Upstream behaviour is kept unless you set one of the options below; the only
 default that differs from upstream is `point_cloud_qos` (see the table).
@@ -68,3 +71,4 @@ Consumers must read fields by name and offset, never by assuming a stride.
 The DVPC runs an unversioned copy in `~/ros2_ws/src/HesaiLidar_ROS_2.0` with local changes
 (at least best-effort QoS). Diff it against this repo and port anything missing before
 switching the car over, and copy its `config.yaml` values (IPs, `use_timestamp_type: 0`, FOV).
+The steps are items 1–4 in [ROADMAP.md](ROADMAP.md).

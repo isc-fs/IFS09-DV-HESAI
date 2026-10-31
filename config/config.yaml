@@ -75,6 +75,19 @@ lidar:
       frame_frequency: 0                    # The frequency that point cloud sends.
       default_frame_frequency: 10.0         # The default frequency that point cloud sends.
       echo_mode_filter: 0                   # return mode filter
+      # ISC: organized grid ("remake"), see docs/ISC.md. -1 = SDK default for the lidar model.
+      # min_azi / min_elev cannot be negative (the SDK treats any negative value as "use default").
+      remake:
+        enable: false
+        use_ring: false                     # true: rows indexed by ring (set max_elev_scan to the channel count, 116 on the ATX)
+        min_azi: -1
+        max_azi: -1
+        azi_resolution: -1
+        max_azi_scan: -1                    # (max_azi - min_azi) / azi_resolution
+        min_elev: -1
+        max_elev: -1
+        elev_resolution: -1
+        max_elev_scan: -1
 
     ros:
       ros_frame_id: hesai_lidar                           # Frame id of packet message and point cloud message
@@ -89,4 +102,9 @@ lidar:
       # ros_send_every_packet_topic: /lidar_every_packet  # Topic used to send every packet through ROS
       send_packet_ros: false                              # true: Send packets through ROS 
       send_point_cloud_ros: true                          # true: Send point cloud through ROS    
-      send_imu_ros: true                                  # true: Send imu through ROS    
+      send_imu_ros: true                                  # true: Send imu through ROS
+      # ISC options, see docs/ISC.md
+      point_format: hesai                                 # hesai: upstream packed 26-byte XYZIRT; isc: aligned 20-byte XYZ+intensity+confidence+ring+time
+      drop_zero_points: false                             # isc only: drop no-return (0,0,0) points (ignored when remake is enabled)
+      header_stamp: first_packet                          # first_packet | last_packet
+      point_cloud_qos: sensor_data                        # sensor_data (best effort) | reliable (upstream default)    

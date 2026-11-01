@@ -303,6 +303,18 @@ if($ENV{ROS_VERSION} MATCHES "2")
           config
           DESTINATION share/${PROJECT_NAME})
 
+  if(BUILD_TESTING)
+    find_package(ament_cmake_gtest REQUIRED)
+    ament_add_gtest(test_isc_cloud test/test_isc_cloud.cpp)
+    target_include_directories(test_isc_cloud PRIVATE src/manager)
+    target_link_libraries(test_isc_cloud hesai_sdk_lib)
+    if(COMMAND ament_target_dependencies)
+      ament_target_dependencies(test_isc_cloud sensor_msgs)
+    else()
+      target_link_libraries(test_isc_cloud ${sensor_msgs_TARGETS})
+    endif()
+  endif()
+
   ament_package()
 
 endif($ENV{ROS_VERSION} MATCHES "2")

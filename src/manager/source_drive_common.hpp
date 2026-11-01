@@ -81,6 +81,19 @@ public:
         YamlRead<float>(      driver_config, "frame_frequency",           driver_param.decoder_param.frame_frequency, 0);
         YamlRead<float>(      driver_config, "default_frame_frequency",   driver_param.decoder_param.default_frame_frequency, 10);
         YamlRead<uint16_t>(   driver_config, "echo_mode_filter",          driver_param.decoder_param.echo_mode_filter, 0);
+        // ISC: organized azimuth x elevation (or ring) grid, see docs/ISC.md. -1 = SDK default for the model.
+        const YAML::Node remake = driver_config["remake"];
+        auto& rq = driver_param.decoder_param.remake_config;
+        YamlRead<bool>(       remake, "enable",                    rq.flag, false);
+        YamlRead<bool>(       remake, "use_ring",                  rq.use_ring_remake, false);
+        YamlRead<float>(      remake, "min_azi",                   rq.min_azi, -1);
+        YamlRead<float>(      remake, "max_azi",                   rq.max_azi, -1);
+        YamlRead<float>(      remake, "azi_resolution",            rq.ring_azi_resolution, -1);
+        YamlRead<int>(        remake, "max_azi_scan",              rq.max_azi_scan, -1);
+        YamlRead<float>(      remake, "min_elev",                  rq.min_elev, -1);
+        YamlRead<float>(      remake, "max_elev",                  rq.max_elev, -1);
+        YamlRead<float>(      remake, "elev_resolution",           rq.ring_elev_resolution, -1);
+        YamlRead<int>(        remake, "max_elev_scan",             rq.max_elev_scan, -1);
         // Do not use YamlRead<uint8_t>, Yaml cannot recognise uint8_t, There will be some unexpected values.
 
         // ROS related

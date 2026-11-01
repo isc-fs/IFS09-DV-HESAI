@@ -3,7 +3,7 @@
 Work on the ATX driver fork, ordered by priority. Sizes: **S** = under a day, **M** = a few
 days, **L** = a sprint or more. Terms are in [GLOSSARY.md](GLOSSARY.md).
 
-Last updated 2026-10-31.
+Last updated 2026-11-01.
 
 ## Goal
 
@@ -63,7 +63,7 @@ umbilical).
 | 12 | **Crop in the driver** | M | Range / height / azimuth limits applied in the parse threads, so the pipeline gets fewer points. Needs the real extrinsic (the lidar is pitched ~8.7° down, the TF says 0). Keep one source of truth: either the driver applies the extrinsic and the TF is identity, or neither. |
 | 13 | **Use confidence for filtering** | M | Once #3 confirms the byte is filled: study it against the noise audit (far-range flicker) and add a threshold option. |
 | 14 | **Faster conversion / publish off the parse thread** | M | Hesai confirms publishing in the decode thread causes loss with several subscribers ([ROS_2.0#91](https://github.com/HesaiTechnology/HesaiLidar_ROS_2.0/issues/91)) and promises a fix upstream; take theirs if it lands first. |
-| 15 | **Tune Cyclone DDS for large messages on the DVPC** | S | Documented ROS 2 fix for large-message loss (*DDS tuning* guide): `net.core.rmem_max=2147483647` in `/etc/sysctl.d/`, a Cyclone XML with `<SocketReceiveBufferSize min="10MB"/>` passed via `CYCLONEDDS_URI` in every service; optionally `net.ipv4.ipfrag_time=3`, `net.ipv4.ipfrag_high_thresh=134217728`. Lives in the pipeline repo's `deploy/`. Measure the bag's missing-cloud rate before and after (11.9 % today). |
+| 15 | **Tune Cyclone DDS for large messages on the DVPC** | S | **Implemented, not installed**: [IFS09-DV-PIPELINE#23](https://github.com/isc-fs/IFS09-DV-PIPELINE/pull/23) (issue #21). Opt-in installer with rollback; reproduced 71.5 % → 0 % loss locally. Remaining: install on the DVPC and measure (pipeline `docs/DDS_TUNING.md`). Uses `max="10MB"`, not the guide's `min`, which stops every node from starting if the kernel limit is not raised. |
 | 16 | **Mask the 8 lowest channels** | S | Rings 60–63 and 112–115 return only beyond ~4 m and are the only source of below-ground strays ([NOISE_CHECK.md](NOISE_CHECK.md)). Drop them with `channel_fov_filter_path` (whole azimuth range per channel) or a ring list option. Confirm on a new bag first. |
 | 17 | **Ask Hesai about the ~4 m floor on the lowest channels** | S | Is it fixed by design or a setting? Include the table from NOISE_CHECK.md. |
 
